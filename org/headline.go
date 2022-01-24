@@ -20,14 +20,15 @@ type Section struct {
 }
 
 type Headline struct {
-	Index      int
-	Lvl        int
-	Status     string
-	Priority   string
-	Properties *PropertyDrawer
-	Title      []Node
-	Tags       []string
-	Children   []Node
+	Index        int
+	Lvl          int
+	Status       string
+	Priority     string
+	Properties   *PropertyDrawer
+	Title        []Node
+	Tags         []string
+	Children     []Node
+	TimePlanning Node
 }
 
 var headlineRegexp = regexp.MustCompile(`^([*]+)\s+(.*)`)
@@ -74,6 +75,12 @@ func (d *Document) parseHeadline(i int, parentStop stopFn) (int, Node) {
 		return parentStop(d, i) || d.tokens[i].kind == "headline" && len(d.tokens[i].matches[1]) <= headline.Lvl
 	}
 	consumed, nodes := d.parseMany(i+1, stop)
+	if len(nodes) > 0 {
+		if d, ok := nodes[0].(Planning); ok {
+			headline.TimePlanning = d
+			nodes = nodes[1:]
+		}
+	}
 	if len(nodes) > 0 {
 		if d, ok := nodes[0].(PropertyDrawer); ok {
 			headline.Properties = &d

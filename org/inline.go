@@ -24,9 +24,11 @@ type ExplicitLineBreak struct{}
 type StatisticToken struct{ Content string }
 
 type Timestamp struct {
-	Time     time.Time
-	IsDate   bool
-	Interval string
+	Time      time.Time
+	IsDate    bool
+	Interval  string
+	Week      string
+	RangeTime time.Time
 }
 
 type Emphasis struct {
@@ -69,7 +71,7 @@ var imageExtensionRegexp = regexp.MustCompile(`^[.](png|gif|jpe?g|svg|tiff?)$`)
 var videoExtensionRegexp = regexp.MustCompile(`^[.](webm|mp4)$`)
 
 var subScriptSuperScriptRegexp = regexp.MustCompile(`^([_^]){([^{}]+?)}`)
-var timestampRegexp = regexp.MustCompile(`^<(\d{4}-\d{2}-\d{2})( [A-Za-z]+)?( \d{2}:\d{2})?( \+\d+[dwmy])?>`)
+var timestampRegexp = regexp.MustCompile(`^<(\d{4}-\d{2}-\d{2})( [A-Za-z\p{Han}]+)?( \d{2}:\d{2})?(?:-(\d{2}:\d{2}))?( \+\d+[dwmy])?>`)
 var footnoteRegexp = regexp.MustCompile(`^\[fn:([\w-]*?)(:(.*?))?\]`)
 var statisticsTokenRegexp = regexp.MustCompile(`^\[(\d+/\d+|\d+%)\]`)
 var latexFragmentRegexp = regexp.MustCompile(`(?s)^\\begin{(\w+)}(.*)\\end{(\w+)}`)
@@ -334,7 +336,7 @@ func (d *Document) parseRegularLink(input string, start int) (int, Node) {
 
 func (d *Document) parseTimestamp(input string, start int) (int, Node) {
 	if m := timestampRegexp.FindStringSubmatch(input[start:]); m != nil {
-		ddmmyy, hhmm, interval, isDate := m[1], m[3], strings.TrimSpace(m[4]), false
+		ddmmyy, wk, hhmm, rangehhmm, interval, isDate := m[1], m[2], m[3], m[4], strings.TrimSpace(m[5]), false
 		if hhmm == "" {
 			hhmm, isDate = "00:00", true
 		}
@@ -342,7 +344,13 @@ func (d *Document) parseTimestamp(input string, start int) (int, Node) {
 		if err != nil {
 			return 0, nil
 		}
-		timestamp := Timestamp{t, isDate, interval}
+		var rt time.Time
+		if rangehhmm != "" {
+			if rt, err = time.Parse(timestampFormat, fmt.Sprintf("%s Mon %s", ddmmyy, rangehhmm)); err != nil {
+				return 0, nil
+			}
+		}
+		timestamp := Timestamp{t, isDate, interval, wk, rt}
 		return len(m[0]), timestamp
 	}
 	return 0, nil

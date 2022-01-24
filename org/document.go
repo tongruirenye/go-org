@@ -63,6 +63,7 @@ type token struct {
 
 var lexFns = []lexFn{
 	lexHeadline,
+	lexSchedule,
 	lexDrawer,
 	lexBlock,
 	lexResult,
@@ -227,6 +228,8 @@ func (d *Document) parseOne(i int, stop stopFn) (consumed int, node Node) {
 		consumed, node = d.parseHeadline(i, stop)
 	case "footnoteDefinition":
 		consumed, node = d.parseFootnoteDefinition(i, stop)
+	case "schedule", "deadline":
+		consumed, node = d.parseSchedule(i, stop)
 	}
 
 	if consumed != 0 {

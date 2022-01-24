@@ -18,7 +18,7 @@ import (
 
 	_ "embed"
 
-	"github.com/niklasfasching/go-org/org"
+	"github.com/tongruirenye/go-org/org"
 )
 
 type Config struct {

@@ -71,7 +71,7 @@ var imageExtensionRegexp = regexp.MustCompile(`^[.](png|gif|jpe?g|svg|tiff?)$`)
 var videoExtensionRegexp = regexp.MustCompile(`^[.](webm|mp4)$`)
 
 var subScriptSuperScriptRegexp = regexp.MustCompile(`^([_^]){([^{}]+?)}`)
-var timestampRegexp = regexp.MustCompile(`^<(\d{4}-\d{2}-\d{2})( [A-Za-z\p{Han}]+)?( \d{2}:\d{2})?(?:-(\d{2}:\d{2}))?( \+\d+[dwmy])?>`)
+var timestampRegexp = regexp.MustCompile(`^<(\d{4}-\d{2}-\d{2})( [A-Za-z\p{Han}]+)?( \d{2}:\d{2})?(?:-(\d{2}:\d{2}))?( \.?\+\d+[dwmy])?>`)
 var footnoteRegexp = regexp.MustCompile(`^\[fn:([\w-]*?)(:(.*?))?\]`)
 var statisticsTokenRegexp = regexp.MustCompile(`^\[(\d+/\d+|\d+%)\]`)
 var latexFragmentRegexp = regexp.MustCompile(`(?s)^\\begin{(\w+)}(.*)\\end{(\w+)}`)
